@@ -1,5 +1,36 @@
 #import "Open.h"
 
+@interface SimpleAlert : NSObject<UIAlertViewDelegate>
+
+typedef void (^AlertViewCompletionBlock)(NSInteger buttonIndex);
+@property (strong,nonatomic) AlertViewCompletionBlock callback;
+
++ (void)showAlertView:(UIAlertView *)alertView withCallback:(AlertViewCompletionBlock)callback;
+
+@end
+
+
+@implementation SimpleAlert
+@synthesize callback;
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    callback(buttonIndex);
+}
+
++ (void)showAlertView:(UIAlertView *)alertView
+         withCallback:(AlertViewCompletionBlock)callback {
+    __block SimpleAlert *delegate = [[SimpleAlert alloc] init];
+    alertView.delegate = delegate;
+    delegate.callback = ^(NSInteger buttonIndex) {
+        callback(buttonIndex);
+        alertView.delegate = nil;
+        delegate = nil;
+    };
+    [alertView show];
+}
+
+@end
+
 @implementation Open
 
 /**
@@ -68,4 +99,29 @@
   return self.fileUrl;
 }
 
+	
+#pragma - QLPreviewControllerDelegate Protocol
+/*
+ * @abstract Invoked by the preview controller before trying to open an URL tapped in the preview.
+ * @result Returns NO to prevent the preview controller from calling -[UIApplication openURL:] on url.
+ * @discussion If not implemented, defaults is YES.
+ */
+- (BOOL)previewController:(QLPreviewController *)controller
+            shouldOpenURL:(NSURL *)url
+           forPreviewItem:(id<QLPreviewItem>)item {
+  UIAlertView *alert = [[UIAlertView alloc]
+      initWithTitle:[NSString stringWithFormat:@"Are you sure you want to open the link?"]
+      message:[url absoluteString]
+      delegate:nil
+      cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
+  [SimpleAlert showAlertView:alert withCallback:^(NSInteger buttonIndex) {
+    // if user pressed yes
+    if(buttonIndex == 1) {
+      [[UIApplication sharedApplication] openURL:url];
+    }
+}];
+  return NO;
+}
+
 @end
+

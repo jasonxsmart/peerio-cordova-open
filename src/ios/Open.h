@@ -8,6 +8,6 @@
                              QLPreviewControllerDataSource, QLPreviewItem>
 
 @property(strong, nonatomic) NSURL *fileUrl;
-@property(readonly) NSURL *previewItemURL;
+@property(readonly, nonatomic) NSURL *previewItemURL;
 
 @end
