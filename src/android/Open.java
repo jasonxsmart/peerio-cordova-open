@@ -3,14 +3,18 @@ package com.disusered;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 
+import org.chromium.base.ContentUriUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.net.Uri;
 import android.content.Intent;
+import android.support.v4.content.FileProvider;
 import android.webkit.MimeTypeMap;
 import android.content.ActivityNotFoundException;
 import android.os.Build;
+
+import java.io.File;
 
 /**
  * This class starts an activity for an intent to view files
@@ -58,10 +62,16 @@ public class Open extends CordovaPlugin {
   private void chooseIntent(String path, CallbackContext callbackContext) {
     if (path != null && path.length() > 0) {
       try {
-        Uri uri = Uri.parse(path);
+        path = path.replace("file://", "");
+        Uri uri =
+                FileProvider.getUriForFile(this.cordova.getActivity().getApplicationContext(),
+                        "com.peerio.fileprovider",
+                        new File(path));
+
         String mime = getMimeType(path);
         Intent fileIntent = new Intent(Intent.ACTION_VIEW);
 
+        fileIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         if( Build.VERSION.SDK_INT > 15 ){
           fileIntent.setDataAndTypeAndNormalize(uri, mime); // API Level 16 -> Android 4.1
         } else {
@@ -80,3 +90,4 @@ public class Open extends CordovaPlugin {
     }
   }
 }
+
