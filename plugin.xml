@@ -31,6 +31,7 @@
     </config-file>
     <source-file src="src/android/Open.java" target-dir="src/com/disusered"/>
     <resource-file src="res/xml/paths.xml" target="res/xml/paths.xml" />
+    <dependency id="cordova-plugin-android-support-v4"/>
   </platform>
   <platform name="ios">
     <config-file parent="/*" target="config.xml">
