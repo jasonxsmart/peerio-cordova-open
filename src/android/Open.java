@@ -62,23 +62,27 @@ public class Open extends CordovaPlugin {
   private void chooseIntent(String path, CallbackContext callbackContext) {
     if (path != null && path.length() > 0) {
       try {
-        path = path.replace("file://", "");
-        Uri uri =
-                FileProvider.getUriForFile(this.cordova.getActivity().getApplicationContext(),
-                        "com.peerio.fileprovider",
-                        new File(path));
-
-        String mime = getMimeType(path);
-        Intent fileIntent = new Intent(Intent.ACTION_VIEW);
-
-        fileIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        if( Build.VERSION.SDK_INT > 15 ){
-          fileIntent.setDataAndTypeAndNormalize(uri, mime); // API Level 16 -> Android 4.1
+        Intent intent = null;
+        if(path.startsWith("https://")) {
+          intent = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
         } else {
-          fileIntent.setDataAndType(uri, mime);
-        }
+          path = path.replace("file://", "");
+          Uri uri =
+                  FileProvider.getUriForFile(this.cordova.getActivity().getApplicationContext(),
+                          "com.peerio.fileprovider",
+                          new File(path));
 
-        cordova.getActivity().startActivity(fileIntent);
+          String mime = getMimeType(path);
+          intent = new Intent(Intent.ACTION_VIEW);
+
+          intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+          if (Build.VERSION.SDK_INT > 15) {
+            intent.setDataAndTypeAndNormalize(uri, mime); // API Level 16 -> Android 4.1
+          } else {
+            intent.setDataAndType(uri, mime);
+          }
+        }
+        cordova.getActivity().startActivity(intent);
 
         callbackContext.success();
       } catch (ActivityNotFoundException e) {

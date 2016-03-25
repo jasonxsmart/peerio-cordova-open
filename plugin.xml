@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" 
     xmlns:android="http://schemas.android.com/apk/res/android" 
     id="com.peerio.cordova.plugin.open" 
-    version="1.0.9">
+    version="1.0.11">
   <name>Open</name>
   <description>Open audio, video, images and more with applications installed on the user's device</description>
   <license>MIT</license>
